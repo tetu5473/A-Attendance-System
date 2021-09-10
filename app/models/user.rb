@@ -16,6 +16,20 @@ class User < ApplicationRecord
   has_secure_password
   validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
 
+
+  def self.import(file)
+    CSV.foreach(file.path, headers: true) do |row|
+      user = find_by(id: row["id"]) || new
+      user.attributes = row.to_hash.slice(*updatable_attributes)
+      user.save!(:validation => false)
+    end
+  end
+
+  def self.updatable_attributes
+      ["name","email","affiliation","employee_number","uid", "basic_work_time", 
+        "designated_work_start_time", "designated_work_end_time","superior","admin","password"]
+  end
+
   # 渡された文字列のハッシュ値を返します。
   def User.digest(string)
     cost = 
