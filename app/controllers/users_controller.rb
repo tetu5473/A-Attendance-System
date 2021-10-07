@@ -121,6 +121,7 @@ class UsersController < ApplicationController
   end
 
   private
+  # "ここに書いてあるのがストロングパラメーターという"
 
     def user_params
       params.require(:user).permit(:name, :email, :affiliation,:employee_number,:uid, :password, 
