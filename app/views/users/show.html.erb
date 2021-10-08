@@ -46,7 +46,7 @@
         <p clas="notice">【勤怠変更申請のお知らせ】</p>
       <% end %> 
       <% if @overtime >= 1  %>
-        <p><%= link_to  "【残業申請のお知らせ】", edit_overtime_notice_user_attendance_path(@user, @overtime), remote: true, class: "notice" %><span class="red_box"><%= "#{@overtime}件の通知があります"%></span></p>
+        <!--<p><!%= link_to  "【残業申請のお知らせ】", edit_overtime_notice_user_attendance_path(@user, @overtime), remote: true, class: "notice" %><span class="red_box"><!%= "#{@overtime}件の通知があります"%></span></p>-->
       <% else %>
         <p clas="notice">【残業申請のお知らせ】</p>
       <% end %> 
@@ -55,29 +55,42 @@
 
 <div class="btn-users-show">
   <%= link_to "勤怠を編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-success" %>
-</div>
+  <!--<!%= link_to "CSV出力",user_path(format: 'csv'),class: "btn btn-primary" %><br>-->
+  <!--<!%= link_to "勤怠修正ログ（承認済）",log_user_attendance_path(@user, @attendance),class: "btn btn-primary" %></div>-->
 
 <div>
   <table class="table table-bordered table-condensed table-hover" id="table-attendances">
     <thead>
       <tr>
-        <th rowspan="4">残業申請</th>
-        <th rowspan="2">日付</th>
-        <th rowspan="2">曜日</th>
-        <th colspan="2">出社</th>
-        <th></th>
-        <th colspan="3">退社</th>
-        <th rowspan="2">在社時間</th>
-        <th rowspan="2">備考</th>
+        <th colspan="3"></th>
+        <th colspan="8">【実績】</th>
+        <th colspan="5">所定外勤務</th>
       </tr>
       
       <tr>
+        <th rowspan="2">残業申請</th>
+        <th rowspan="2">日付</th>
+        <th rowspan="2">曜日</th>
+        <th colspan="3">出社</th>
+        <th colspan="3">退社</th>
+        <th rowspan="2">在社時間</th>
+        <th rowspan="2">備考</th>
+        <th colspan="2">終了予定時間</th>
+        <th rowspan="2">時間外時間</th>
+        <th rowspan="2">業務処理内容</th>
+        <th rowspan="2">指示者確認㊞</th>
+     </tr>
+      
+     <tr>
         <th>時</th>
         <th>分</th>
         <th></th>
         <th>時</th>
         <th>分</th>
-      </tr>
+        <th></th>
+        <th>時</th>
+        <th>分</th>
+     </tr>
     </thead>
 
     <tbody>
@@ -95,7 +108,9 @@
         <tr>
           <td><%= link_to "残業申請", edit_overtime_request_user_attendance_path(@user,day), remote: true , class: "btn btn-primary" %></td>
           <td><%= l(day.worked_on, format: :short) %></td>
+          <!--日付を呼び出すコード-->
           <td class="<%= css_class %>"><%= %w{日 月 火 水 木 金 土}[day.worked_on.wday] %></td>
+          <!--曜日を呼び出すコード-->
           <td><%= l(day.started_at, format: :hour) if day.started_at.present? %></td>
           <td><%= l(day.started_at.floor_to(15.minutes), format: :minute) if day.started_at.present? %></td>
           <td>
@@ -113,11 +128,44 @@
             <% @total_working_times = @total_working_times.to_f + str_times.to_f %>
             <% end %>
           </td>
-          <td><%= day.note %></td>
+<td><%= day.note %></td>
+          <% if day.indicater_reply == "承認" %>
+            <td><%= day.overtime_finished_at.try(:strftime,"%H") %></td>
+            <td><%= day.overtime_finished_at.try(:strftime,"%M") %></td>
+            <% if day.overtime_finished_at.present? %> 
+              <td><%= overtime_worked_on(day.overtime_finished_at, @user.designated_work_end_time, day.tomorrow) %></td>
+            <% else %>
+              <td></td>
+            <% end %>
+            <td><%= day.overtime_work %></td>
+          <% else %>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          <% end %>
+          <td>
+            <p>
+              <% if day.indicater_check.present? %>
+                <%= "#{day.indicater_check}に残業#{day.indicater_reply}" %>
+              <% elsif day.indicater_reply == "承認" %>
+                <%= "残業申請が#{day.indicater_reply}されました" %>
+              <% elsif day.indicater_reply == "否認" %>
+                <%= "残業申請が#{day.indicater_reply}されました" %>
+              <% end %>
+            </p>
+            <p>
+              <% if day.indicater_check_edit.present? %>
+                <%= "#{day.indicater_check_edit}に勤怠変更#{day.indicater_reply_edit}" %>
+                <% elsif day.indicater_reply_edit == "承認" %>
+                <%= "勤怠変更申請が#{day.indicater_reply_edit}されました" %>
+              <% elsif day.indicater_reply_edit == "否認" %>
+                <%= "勤怠変更申請が#{day.indicater_reply_edit}されました" %>
+              <% end %>
+            </td>
+            </p>
         </tr>
       <% end %>
-
-
     </tbody>
 
     <tfoot>
