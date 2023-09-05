@@ -5,25 +5,91 @@
   text-align: center;
 }
 
-/* ユーザー情報下ボタン */
-
-.btn-users-show {
-  margin-top: -10px;
-  margin-bottom: 10px;
+p {
+  margin-bottom: 0px;
 }
+
+.notice-group {
+  margin-bottom: 20px;
+}
+
+.notice {
+color:red;
+
+}
+
+.red_box {
+  color:red;
+  padding: 0.2em 0.2em;
+  font-weight: bold;
+  border: solid 3px red
+  
+  }
+
+  .red-group {
+    margin-bottom: 10px;
+  }
+
+  .post {
+    margin-top: 20px;
+  }
+
 
 /* ユーザー勤怠情報テーブル */
 
 #table-attendances {
+
+  margin-top:10px;
+
   th {
-    vertical-align: middle;
+    vertical-align: bottom;
     text-align: center;
+    margin-top: 20px;
+    
   }
   td {
     vertical-align: middle;
     text-align: center;
   }
+    // class="line"の行の奇数列に色をつける
+    .line tr:nth-child(odd) td{
+      background: #f8f8f8;
+    }
+
+    .maru {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+    }
+    .size_small{
+      width: 18px;
+      height: 18px;
+    }
+    .letter3 {
+      font-size: 0.7em;
+      line-height: 1.5em;
+    }
+    .black {
+      color: black;
+      border: 1px solid black;
+    }
 }
+
+#table-attendance-index {
+
+  th {
+    vertical-align: bottom;
+    text-align: center;
+    margin-top: 20px;
+
+  }
+  td {
+    vertical-align: bmiddle;
+    text-align: center;
+  }
+}
+
 
 /* 入力フォーム */
 
@@ -43,21 +109,17 @@
   margin-top: 10px;
 }
 
-/* ユーザー一覧ページ */
 
-#table-users {
+.log {
+  margin-top: 30px;
+  th {
+text-align: center;
+  } 
   td {
-    vertical-align: middle;
-  }  
+    text-align: center;
+  }
 }
 
-/* 基本情報編集モーダルウインドウ */
-
-.label-basic-info {
-  margin-top: 5px;
-}
-
-.btn-basic-info {
-  margin: 15px 0;
-  width: 30%;
+.log-table {
+  margin-top: 10px;
 }

@@ -15,10 +15,26 @@ class User < ApplicationRecord
   validates :work_time, presence: true
   has_secure_password
   validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
-
-
+  
+  #   def self.import(file)
+  #     # contents = File.read(file.path).force_encoding("SHIFT_JIS").encode("UTF-8")
+  #     contents = File.read(file.path).force_encoding("SHIFT_JIS").encode("UTF-8", invalid: :replace, undef: :replace)
+  #     CSV.parse(contents, headers: true) do |row|
+  # # def self.import(file)
+  # #   CSV.foreach(file.path, encoding: 'MS932:utf-8', headers: true) do |row|
+  #     user = find_or_initialize_by(id: row["id"])
+  #     user.attributes = row.to_hash.slice(*updatable_attributes)
+  #     user.save
+  #     if user.errors.any?
+  #     user.errors.full_messages.each do |message|
+  #       flash[:danger] = message
+  #     end       
+  #     end
+  #   end
+  #   end
+  
   def self.import(file)
-    CSV.foreach(file.path, headers: true) do |row|
+    CSV.foreach(file.path, encoding: 'MS932',headers: true) do |row|
       user = find_by(id: row["id"]) || new
       user.attributes = row.to_hash.slice(*updatable_attributes)
       user.save!(:validation => false)

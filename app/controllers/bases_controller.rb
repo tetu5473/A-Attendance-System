@@ -50,8 +50,6 @@ class BasesController < ApplicationController
   end
 
 
-
-
 private
 
     def base_params

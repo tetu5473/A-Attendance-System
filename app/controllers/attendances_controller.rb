@@ -1,11 +1,66 @@
 class AttendancesController < ApplicationController
-  before_action :set_user, only: [:edit_one_month, :update_one_month]
+  before_action :set_user, only: [:edit_one_month, :update_one_month, :edit_overtime_notice]
   before_action :logged_in_user, only: [:update, :edit_one_month]
   before_action :admin_or_correct_user, only: [:update, :edit_one_month, :update_one_month]
   before_action :set_one_month, only: :edit_one_month
+  before_action :restrict_admin, only: [:edit_one_month]
+
 
   UPDATE_ERROR_MSG = "勤怠登録に失敗しました。やり直してください。"
   
+  # 残業申請お知らせモーダル	
+  def edit_overtime_notice
+    @users = User.joins(:attendances).group("users.id").where(attendances: {indicater_reply: "申請中"})
+    @attendances = Attendance.where.not(overtime_finished_at: nil).order("worked_on ASC")
+  end
+
+# 残業申請お知らせモーダル更新
+  def update_overtime_notice
+    ActiveRecord::Base.transaction do 
+      o1 = 0
+      o2 = 0
+      o3 = 0
+      overtime_notice_params.each do |id, item|
+        if item[:indicater_reply].present?
+          if (item[:change] == "1") && (item[:indicater_reply] == "なし" || item[:indicater_reply] == "承認" || item[:indicater_reply] == "否認")
+            attendance = Attendance.find(id)
+            user = User.find(attendance.user_id)
+            if item[:indicater_reply] == "なし" 
+              o1+= 1
+              item[:overtime_finished_at] = nil
+              item[:tomorrow] = nil
+              item[:overtime_work] = nil
+              item[:indicater_check] = nil
+            elsif item[:indicater_reply] == "承認"
+              item[:indicater_check] = nil
+              o2 += 1
+              attendance.indicater_check_anser = "残業申請を承認しました"
+            elsif item[:indicater_reply] == "否認"
+              item[:overtime_finished_at] = nil
+              item[:tomorrow] = nil
+              item[:overtime_work] = nil
+              item[:indicater_check] = nil
+              item[:indicater_check] = nil
+              o3 += 1
+              attendance.indicater_check_anser = "残業申請を否認しました"
+            end
+            attendance.update_attributes!(item)
+          end
+        else 
+          flash[:danger] = "指示者確認を更新、または変更にチェックを入れて下さい"
+          redirect_to user_url(params[:user_id])
+          return
+        end
+      end
+      flash[:success] = "【残業申請】　#{o1}件なし,　#{o2}件承認,　#{o3}件否認しました"
+      redirect_to user_url(params[:user_id])
+      return
+    end
+  rescue ActiveRecord::RecordInvalid 
+    flash[:danger] = "無効な入力データがあった為、更新をキャンセルしました。"
+    redirect_to edit_overtime_notice_user_attendance_url(@user,item)
+  end
+
   # 残業申請モーダル
   def edit_overtime_request
     @user = User.find(params[:user_id])
@@ -81,4 +136,10 @@ class AttendancesController < ApplicationController
       # attendanceテーブルの（残業終了予定時間,翌日、残業内容、指示者確認（どの上長か）、指示者確認（申請かどうか））
       params.require(:attendance).permit(:overtime_finished_at, :tomorrow, :overtime_work,:indicater_check,:indicater_reply)
     end
+    # 残業申請お知らせモーダルの情報
+    def overtime_notice_params
+      # attendanceテーブルの（指示者確認,変更）
+      params.require(:user).permit(attendances: [:overtime_work, :indicater_reply, :change, :indicater_check, :overtime_finished_at, :indicater_check_anser])[:attendances]
+    end 
 end
+

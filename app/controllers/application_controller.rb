@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
 
   $days_of_the_week = %w{日 月 火 水 木 金 土}
 
-  # beforフィルター
+  # beforeフィルター
 
   # paramsハッシュからユーザーを取得します。
   def set_user
@@ -50,5 +50,12 @@ class ApplicationController < ActionController::Base
   rescue ActiveRecord::RecordInvalid # トランザクションによるエラーの分岐です。
     flash[:danger] = "ページ情報の取得に失敗しました、再アクセスしてください。"
     redirect_to root_url
+  end
+  
+  def restrict_admin
+    if current_user.admin?
+      flash[:danger] = "管理者はこのページにアクセスできません。"
+      redirect_to root_path # または別の適切なパス
+    end
   end
 end

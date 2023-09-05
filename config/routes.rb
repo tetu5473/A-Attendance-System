@@ -22,12 +22,19 @@ Rails.application.routes.draw do
       patch 'update_index'
       get 'attendances/edit_one_month'
       patch 'attendances/update_one_month' # この行が追加対象です。
+      # 確認のshowページ
+      get 'verifacation'
     end
   resources :attendances, only: [:update] do
       member do
         # 残業申請モーダル
         get 'edit_overtime_request'
-        patch 'update_overtime_request'  
+        patch 'update_overtime_request' 
+        # 残業申請お知らせモーダル
+        get 'edit_overtime_notice'
+        patch 'update_overtime_notice'
+        # 残業申請確認モーダル
+        get 'show_overtime_verifacation'
       end
   end
   end
