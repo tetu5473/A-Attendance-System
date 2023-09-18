@@ -74,6 +74,9 @@ class AttendancesController < ApplicationController
     if @attendance.update_attributes(overtime_params)
       flash[:success] = "残業申請を受け付けました"
       redirect_to user_url(@user)
+    else
+      flash[:danger] = "残業申請に失敗しました: " + @attendance.errors.full_messages.join(", ")
+      redirect_to user_url(@user)
     end  
   end
 
@@ -98,6 +101,7 @@ class AttendancesController < ApplicationController
   end
 
   def edit_one_month
+    @superior = User.where(superior: true).where.not( id: current_user.id )
   end
 
   def update_one_month

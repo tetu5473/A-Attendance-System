@@ -53,9 +53,7 @@ class ApplicationController < ActionController::Base
   end
   
   def restrict_admin
-    if current_user.admin?
-      flash[:danger] = "管理者はこのページにアクセスできません。"
-      redirect_to root_path # または別の適切なパス
-    end
+    redirect_to users_url if current_user.admin?  
   end
 end
+
