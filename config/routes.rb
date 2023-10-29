@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   post   '/login', to: 'sessions#create'
   delete '/logout', to: 'sessions#destroy'
   resources :bases
+  
   resources :users do
     collection { post :import }
     collection do
@@ -22,6 +23,8 @@ Rails.application.routes.draw do
       patch 'update_index'
       get 'attendances/edit_one_month'
       patch 'attendances/update_one_month' # この行が追加対象です。
+      get 'attendances/edit_month_approval' #所属長承認の編集
+      patch 'attendances/update_month_approval' #所属長承認の更新
       # 確認のshowページ
       get 'verifacation'
     end
@@ -35,6 +38,14 @@ Rails.application.routes.draw do
         patch 'update_overtime_notice'
         # 残業申請確認モーダル
         get 'show_overtime_verifacation'
+        # 勤怠変更お知らせモーダル
+        get 'edit_one_month_notice'
+        patch 'update_one_month_notice'
+        #１ヶ月承認モーダル
+        get 'edit_month_approval_notice'
+        patch 'update_month_approval_notice'
+         # 勤怠ログ
+        get 'log'
       end
   end
   end

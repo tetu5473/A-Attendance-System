@@ -28,9 +28,9 @@
 
 
 
-  <%= link_to "勤怠を編集","#",class: "btn btn-default disabled" %> 
-  <%= link_to "CSV出力","#" ,class: "btn btn-default disabled" %><br>
-  <%= link_to "勤怠修正ログ（承認済)","#",class: "btn btn-default disabled" %>
+  <!--<!%= link_to "勤怠を編集","#",class: "btn btn-default disabled" %> -->
+  <!--<!%= link_to "CSV出力","#" ,class: "btn btn-default disabled" %><br>-->
+  <!--<!%= link_to "勤怠修正ログ（承認済)","#",class: "btn btn-default disabled" %>-->
 
 <div>
   <table class="table table-bordered table-condensed table-hover" id="table-attendances">
@@ -91,7 +91,7 @@
           <td>
           <td>
             <% if day.started_at.present? && day.finished_at.present? %>
-            <%= str_times = working_times(day.started_at, day.finished_at) %>
+            <%= str_times = working_times(day.started_at, day.finished_at, day.tomorrow_edit) %>
             <% @total_working_times = @total_working_times.to_f + str_times.to_f %>
             <% end %>
           </td>
@@ -153,7 +153,7 @@
           <td></td>
         <td>
           <%= form_with(model: @user, local: true) do |f| %>
-          <fieldset disabled>
+          <!--<fieldset disabled>-->
           <div class="form-group">
             <% if @attendance.indicater_reply_month == "承認" %>
               <%= f.label :indicater_check_month, "所属長承認　#{@attendance.indicater_check_month}から承認済" %>
@@ -164,12 +164,12 @@
             <% else %>  
               <%= f.label :indicater_check_month,"所属長承認 未" %>
             <% end %>
-            <%= f.select :boss,{'上長A':1, '上長B':2}, { include_blank: ''}, { class: 'form-control input-sm' , required: true } %>
+            <!--<!%= f.select :boss,{'上長A':1, '上長B':2}, { include_blank: ''}, { class: 'form-control input-sm' , required: true } %>-->
           </div>
           
-          <div class="form-group">
-            <%= f.submit '申請する', class: 'btn btn-default disabled' %>
-          </div>
+          <!--<div class="form-group">-->
+          <!--  <!%= f.submit '申請する', class: 'btn btn-default disabled' %>-->
+          <!--</div>-->
           <% end %>
         </td>
       </tr>

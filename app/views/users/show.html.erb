@@ -56,8 +56,7 @@
 <div class="btn-users-show">
   <%= link_to "勤怠を編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-success" %>
   <%= link_to "CSV出力",user_path(format: 'csv'),class: "btn btn-primary" %><br>
-
-  <!--<!%= link_to "勤怠修正ログ（承認済）",log_user_attendance_path(@user, @attendance),class: "btn btn-primary" %></div>-->
+  <%= link_to "勤怠修正ログ（承認済）",log_user_attendance_path(@user, @attendance),class: "btn btn-primary" %>
 
 <div>
   <table class="table table-bordered table-condensed table-hover" id="table-attendances">
@@ -125,12 +124,12 @@
           
           <td>
             <% if day.started_at.present? && day.finished_at.present? %>
-              <%= str_times = working_times(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
+              <%= str_times = working_times(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes),day.tomorrow_edit ) %>
             <% @total_working_times = @total_working_times.to_f + str_times.to_f %>
             <% end %>
           </td>
-<td><%= day.note %></td>
-          <% if day.indicater_reply == "承認" %>
+          <td><%= day.note %></td>
+            <% if day.indicater_reply == "承認" %>
             <td><%= day.overtime_finished_at.try(:strftime,"%H") %></td>
             <td><%= day.overtime_finished_at.try(:strftime,"%M") %></td>
             <% if day.overtime_finished_at.present? %> 
@@ -169,23 +168,42 @@
       <% end %>
     </tbody>
 
-    <tfoot>
-      <!--rowspan:縦結合、colspan：横結合-->
+        <tfoot>
       <tr>
-        <td colspan="2">累計日数</td>
-        <td colspan="2">総合勤務時間</td>
-        <td rowspan="2"></td>
-        <td rowspan="2"></td>
-        <td colspan="2">累計在社時間</td>
-        <td rowspan="2"></td>
-        <td rowspan="2"></td>
+        <td></td>
+        <td colspan="2">累計日数<br> <%= @attendances.count %>日</td>
+        
+        <td colspan="6">総合勤務時間<br><%= format_basic_info(@user.work_time).to_f * @worked_sum %></td>
+        
+        <td>累計在社時間<br><%= format("%.2f", @total_working_times.to_f) %></td>
+        
+        <td colspan="5">
+          
+          <td>
+          <%= form_with(model: @user, url: attendances_update_month_approval_user_path(@user), method: :patch , local: true) do |f| %> 
+              <%= f.hidden_field :indicater_reply_month, :value => "申請中" %>
+              <%= f.hidden_field :month_approval, :value => @first_day %>
+              <div class="form-group">
+                <% if @attendance.indicater_reply_month == "承認" %>
+                  <%= f.label :indicater_check_month, "所属長承認　#{@attendance.indicater_check_month}から承認済" %>
+                <% elsif @attendance.indicater_reply_month == "否認" %>
+                  <%= f.label :indicater_check_month, "所属長否認　#{@attendance.indicater_check_month}から否認済" %>
+                <% elsif @attendance.indicater_reply_month == "申請中" %>
+                  <%= f.label :indicater_check_month, "所属長承認　#{@attendance.indicater_check_month}へ申請中" %>
+                <% else %>  
+                  <%= f.label :indicater_check_month,"所属長承認 未" %>
+                <% end %>  
+                  <%= f.collection_select(:indicater_check_month, @superior, :name, :name, {prompt: "上長を選択して下さい"}, {class: "form-control input-sm"})%>
+              </div>
+              <div class="form-group">
+                <%= f.submit '申請', class: 'btn btn-primary' %>
+              </div>
+          <% end %>
+        </td>
+        
+        
       </tr>
-      <tr>
-        <td colspan="2"><%= @attendances.count %></td>
-        <td colspan="2"><%= format_basic_info(@user.work_time).to_f * @worked_sum %></td>
-        <td colspan="2"><%= format("%.2f", @total_working_times.to_f) %></td>
-      </tr>
-    </tfoot>    
+    </tfoot>
   </table>
 </div>
 
