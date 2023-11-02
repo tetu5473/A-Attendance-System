@@ -8,8 +8,12 @@
     <div class="modal-body">
       <%= form_with(model: @user, url: update_one_month_notice_user_attendance_path, method: :patch, local: true) do |f| %>
         <% @users.each do |user|%>
+        <% relevant_attendances = @attendances.select { |day| day.user_id == user.id && day.indicater_reply_edit == "申請中" && current_user.name == day.indicater_check_edit } %>
+        <% if relevant_attendances.any? %>
         <h3 align="center" class="modal-title"><%= "【#{user.name}からの勤怠変更申請】" %></h3>
-        <% @attendances.each do |day| %>
+        <% end %>
+        <% relevant_attendances.each do |day| %>
+        <!--<!% @attendances.each do |day| %>-->
           <%= f.fields_for "attendances[]", day do |d| %>       
             <% if day.user_id == user.id && day.indicater_reply_edit == "申請中" && current_user.name == day.indicater_check_edit %>
             <table class="table table-bordered table-condensed one_month_notice-table">
@@ -83,3 +87,4 @@
         </div>
       </div>
     </div>
+    

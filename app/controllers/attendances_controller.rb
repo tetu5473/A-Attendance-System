@@ -140,7 +140,7 @@ class AttendancesController < ApplicationController
             e1+= 1
             item[:started_edit_at] = nil
             item[:finished_edit_at] = nil
-            item[:tomorrow] = nil
+            item[:tomorrow_edit] = nil
             item[:note] = nil
             item[:indicater_check_edit] = nil
         elsif item[:indicater_reply_edit] == "承認"
@@ -152,13 +152,13 @@ class AttendancesController < ApplicationController
               item[:finished_before_at] = attendance.finished_at
             end 
             item[:finished_at] = attendance.finished_edit_at
-            item[:indicater_check_edit] = nil
+            # item[:indicater_check_edit] = nil
             e2 += 1          
             attendance.indicater_check_anser = "勤怠変更申請を承認しました"
         elsif item[:indicater_reply_edit] == "否認"
             item[:started_edit_at] = nil
             item[:finished_edit_at] = nil
-            item[:tomorrow] = nil
+            item[:tomorrow_edit] = nil
             item[:note] = nil
             item[:indicater_check_edit] = nil
             e3 += 1
